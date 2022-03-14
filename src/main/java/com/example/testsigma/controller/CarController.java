@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -18,47 +19,46 @@ public class CarController {
         this.carRepository = carRepository;
     }
 
-    @PostMapping(value = "/cars")
-    public ResponseEntity<?> create(@RequestBody Car car) {
-        carRepository.save(car);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @GetMapping(value = "/cars")
-    public ResponseEntity<List<Car>> read() {
-        final List<Car> cars = (List<Car>) carRepository.findAll();
-
-        return !cars.isEmpty()
-                ? new ResponseEntity<>(cars, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @GetMapping(value = "/cars/{id}")
-    public ResponseEntity<Car> read(@PathVariable(name = "id") long id) {
-        final Car car = carRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-
-        return car != null
-                ? new ResponseEntity<>(car, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @PutMapping(value = "/cars/{id}")
-    public ResponseEntity<?> update(@PathVariable(name = "id") int id, @RequestBody Car car) {
-        if (carRepository.existsById((long) id)) {
-            carRepository.save(car);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @GetMapping("/cars")
+    public ResponseEntity<List<Car>> getAllCars() {
+        List<Car> cars = new ArrayList<>(carRepository.findAll());
+        if (cars.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        return new ResponseEntity<>(cars, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/cars/{id}")
-    public ResponseEntity<?> delete(@PathVariable(name = "id") int id) {
-        Car car = carRepository.findById((long) id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        carRepository.delete(car);
+    @GetMapping("/cars/{id}")
+    public ResponseEntity<Car> getCarById(@PathVariable("id") long id) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Not found Car with id = " + id));
+        return new ResponseEntity<>(car, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+    @PostMapping("/cars")
+    public ResponseEntity<Car> createCar(@RequestBody Car car) {
+        Car _car = carRepository.save(new Car(car.getNumber(), car.getName()));
+        return new ResponseEntity<>(_car, HttpStatus.CREATED);
+    }
+
+    @PutMapping("cars/{id}")
+    public ResponseEntity<Car> updateCar(@PathVariable("id") long id, @RequestBody Car car) {
+        Car _car = carRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Not found Car with id = " + id));
+        _car.setNumber(car.getNumber());
+        _car.setName(car.getName());
+        return new ResponseEntity<>(carRepository.save(_car), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/cars")
+    public ResponseEntity<HttpStatus> deleteAllCars() {
+        carRepository.deleteAll();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/cars/{id}")
+    public ResponseEntity<HttpStatus> deleteCar(@PathVariable("id") long id) {
+        carRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

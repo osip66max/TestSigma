@@ -12,30 +12,30 @@ import java.util.Objects;
 @Setter
 @ToString
 @Entity
-@Table(name = "car")
-public class Car {
+@Table(name = "parking")
+public class Parking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String number;
+    private int number;
 
-    private String name;
+    private boolean occupancy;
 
-    public Car() {
+    public Parking() {
     }
 
-    public Car(String number, String name) {
+    public Parking(int number, boolean occupancy) {
         this.number = number;
-        this.name = name;
+        this.occupancy = occupancy;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Car car = (Car) o;
-        return id != null && Objects.equals(id, car.id);
+        Parking parking = (Parking) o;
+        return id != null && Objects.equals(id, parking.id);
     }
 
     @Override
