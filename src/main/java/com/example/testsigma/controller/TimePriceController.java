@@ -1,5 +1,6 @@
 package com.example.testsigma.controller;
 
+import com.example.testsigma.model.Car;
 import com.example.testsigma.model.TimePrice;
 import com.example.testsigma.repository.CarRepository;
 import com.example.testsigma.repository.ParkingRepository;
@@ -28,6 +29,15 @@ public class TimePriceController {
         this.timePriceRepository = timePriceRepository;
     }
 
+    @Operation(summary = "Add link")
+    @PostMapping("/timeprices")
+    public ResponseEntity<TimePrice> createTimePrice(@RequestBody TimePrice timePrice) {
+        TimePrice _timePrice = timePriceRepository.
+                save(new TimePrice(timePrice.getTime(), timePrice.getPrice(), timePrice.getCar(), timePrice.getParking()));
+        return new ResponseEntity<>(_timePrice, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Get all links")
     @GetMapping("/timeprices")
     public ResponseEntity<List<TimePrice>> getAllTimePrices() {
         List<TimePrice> timePrices = new ArrayList<>(timePriceRepository.findAll());
@@ -37,22 +47,21 @@ public class TimePriceController {
         return new ResponseEntity<>(timePrices, HttpStatus.OK);
     }
 
-    @DeleteMapping("/timeprices/{id}")
-    public ResponseEntity<HttpStatus> deleteTimePrice(@PathVariable("id") long id) {
-        timePriceRepository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @Operation(summary = "Update links by number of car")
+    @PutMapping("timeprices/{number}")
+    public ResponseEntity<List<TimePrice>> updateTimePrice(@Parameter(description = "Number of car to be update links")
+                                                               @PathVariable("number") String number,
+                                                           @RequestBody TimePrice timePrice) {
+        List<TimePrice> _timePrice = new ArrayList<>();
+        timePriceRepository.findAllByCarNumber(number).forEach(timePrice1 -> {
+            timePrice1.setTime(timePrice.getTime());
+            timePrice1.setPrice(timePrice.getPrice());
+            _timePrice.add(timePrice1);
+        });
+        return new ResponseEntity<>(timePriceRepository.saveAll(_timePrice), HttpStatus.OK);
     }
 
-    @DeleteMapping("/cars/{carId}/timeprices")
-    public ResponseEntity<List<TimePrice>> deleteAllTimePricesOfCar(@PathVariable(value = "carId") Long carId) {
-        if (!carRepository.existsById(carId)) {
-            throw new IllegalArgumentException("Not found Car with id = " + carId);
-        }
-        timePriceRepository.deleteByCarId(carId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @Operation(summary = "Delete all links")
+    @Operation(summary = "Delete all links or by number of car")
     @DeleteMapping("/timeprices")
     public ResponseEntity<HttpStatus> deleteAllTimePrices(@Parameter(description = "Number of car to be delete links (optional)")
                                                               @RequestParam(required = false) String number) {

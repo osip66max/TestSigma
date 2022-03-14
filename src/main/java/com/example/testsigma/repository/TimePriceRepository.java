@@ -9,11 +9,9 @@ import java.util.List;
 
 @Repository
 public interface TimePriceRepository extends JpaRepository<TimePrice, Long> {
-    List<TimePrice> findByCarId(Long carId);
-
-    @Transactional
-    void deleteByCarId(long carId);
 
     @Transactional
     void deleteByCarNumber(String carNumber);
+
+    List<TimePrice> findAllByCarNumber(String carNumber);
 }

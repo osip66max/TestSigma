@@ -1,7 +1,8 @@
 package com.example.testsigma.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,7 +13,6 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @Entity
 public class TimePrice {
     @Id
@@ -23,19 +23,27 @@ public class TimePrice {
 
     private int price;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "car_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     @ToString.Exclude
     private Car car;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "parking_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     @ToString.Exclude
     private Parking parking;
+
+    public TimePrice() {
+    }
+
+    public TimePrice(int time, int price, Car car, Parking parking) {
+        this.time = time;
+        this.price = price;
+        this.car = car;
+        this.parking = parking;
+    }
 
     @Override
     public boolean equals(Object o) {

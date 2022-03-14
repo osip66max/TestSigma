@@ -38,6 +38,7 @@ public class Car {
         return id != null && Objects.equals(id, car.id);
     }
 
+
     @Override
     public int hashCode() {
         return getClass().hashCode();
