@@ -1,6 +1,5 @@
 package com.example.testsigma.controller;
 
-import com.example.testsigma.model.Car;
 import com.example.testsigma.model.TimePrice;
 import com.example.testsigma.repository.CarRepository;
 import com.example.testsigma.repository.ParkingRepository;

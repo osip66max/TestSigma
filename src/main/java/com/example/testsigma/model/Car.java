@@ -1,16 +1,18 @@
 package com.example.testsigma.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.Objects;
+import java.util.List;
 
+@AllArgsConstructor
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
 @Entity
 @Table(name = "car")
 public class Car {
@@ -22,25 +24,7 @@ public class Car {
 
     private String name;
 
-    public Car() {
-    }
-
-    public Car(String number, String name) {
-        this.number = number;
-        this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Car car = (Car) o;
-        return id != null && Objects.equals(id, car.id);
-    }
-
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+    @JsonIgnore
+    @OneToMany(mappedBy = "car", fetch = FetchType.EAGER)
+    private List<TimePrice> timePrices;
 }
